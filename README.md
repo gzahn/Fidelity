@@ -37,6 +37,10 @@ Zahn, G., & Neat, A. (2025). gzahn/Fidelity: Beta release (Version 0.0.0) [Compu
 
 
 ## Example usage
+
+For a thorough walkthrough, see the [Tutorial](https://rpubs.com/neata/1337966)
+
+
 ```
 # load Fidelity
 library(Fidelity)
