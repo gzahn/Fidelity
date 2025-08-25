@@ -346,7 +346,7 @@ specifiR_physeq <-
                  n_samples_end=nrow(comm_subset),
                  n_taxa_start=ncol(comm),
                  n_taxa_end=ncol(comm_subset),
-                 n_raretaxa_removed=(ncol(comm) - ncol(comm_subset)),
+                 n_raretaxa_removed=(ncol(comm) - ncol(comm_subset))-1,
                  occurence_cutoff=max(to_remove),
                  pval_cutoff=pval.cutoff,
                  n_perm=n.perm)
