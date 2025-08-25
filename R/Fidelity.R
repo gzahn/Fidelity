@@ -1,6 +1,6 @@
 #' Quantify group specificity of entire communities for each sample
 #'
-#' Function specifiR assigns a community level specificity index to each community in the data set.The output values range from 0-1, with values closer to one indicating a community with taxa that are more host specific.
+#' Function Fidelity assigns a community level specificity index to each community in the data set.The output values range from 0-1, with values closer to one indicating a community with taxa that are more host specific.
 #'
 #'
 #' @import tidyr
@@ -42,13 +42,13 @@
 #' comm_df <- as.data.frame(comm_matrix)
 #' groups <- factor(rep(paste0("Group", 1:3), length.out = 100))
 #'
-#' # run specifiR with default settings
-#' out <- specifiR(comm = comm_df, groups = groups)
+#' # run Fidelity with default settings
+#' out <- Fidelity(comm = comm_df, groups = groups)
 #' out$community_specificity_index
 #'
 #' @export
 
-specifiR <-
+Fidelity <-
   function(comm,
            groups,
            seed=666,

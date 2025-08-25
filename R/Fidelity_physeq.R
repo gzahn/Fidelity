@@ -1,6 +1,6 @@
 #' Quantify group specificity of entire communities for each sample
 #'
-#'Function specifiR assigns a community level specificity index to each community in the data set.The output values range from 0-1, with values closer to one indicating a community with taxa that are more host specific. This version of the function is a convenience wrapper for phyloseq users.
+#'Function Fidelity assigns a community level specificity index to each community in the data set.The output values range from 0-1, with values closer to one indicating a community with taxa that are more host specific. This version of the function is a convenience wrapper for phyloseq users.
 #'
 #'
 #' @import tidyr
@@ -36,12 +36,12 @@
 #' The user has the option of removing rare taxa from the CWM analysis. Rare taxa bias communities to appear more host specific. The rare taxa removal threshold is determined by first grouping taxa by the number of samples in which they occur, then removing the groups in which the taxa are so rare that no taxon has a significant result from the ISA. The default is for rare taxa to be removed.
 #'
 #' @examples
-#' out <- specifiR_physeq(physeq = ps,groups = "depth",n.perm = 99)
+#' out <- Fidelity_physeq(physeq = ps,groups = "depth",n.perm = 99)
 #' out$community_specificity_index
 #'
 #' @export
 
-specifiR_physeq <-
+Fidelity_physeq <-
   function(physeq,
            groups,
            seed=666,

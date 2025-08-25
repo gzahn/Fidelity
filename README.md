@@ -1,6 +1,6 @@
-# specifiR
+# Fidelity
 
-<img src="https://github.com/gzahn/specifiR/blob/main/assets/sticker.png" alt="hex_sticker" width="200"/>
+<img src="https://github.com/gzahn/Fidelity/blob/main/assets/sticker.png" alt="hex_sticker" width="200"/>
 
 (Replace with better hex sticker...)
 
@@ -17,7 +17,7 @@ The resulting indices can be used to compare the specificity of microbial commun
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
     
-devtools::install_github("gzahn/specifiR")
+devtools::install_github("gzahn/Fidelity")
 ```
 
 ## Requirements
@@ -32,14 +32,14 @@ Depends on:
 
 [![DOI](https://zenodo.org/badge/1016289767.svg)](https://doi.org/10.5281/zenodo.16095120)
 
-Zahn, G., & Neat, A. (2025). gzahn/specifiR: Beta release (Version 0.0.0) [Computer software]. Zenodo. https://doi.org/10.5281/ZENODO.16095121
+Zahn, G., & Neat, A. (2025). gzahn/Fidelity: Beta release (Version 0.0.0) [Computer software]. Zenodo. https://doi.org/10.5281/ZENODO.16095121
 
 
 
 ## Example usage
 ```
-# load specifiR
-library(specifiR)
+# load Fidelity
+library(Fidelity)
 
 # LOAD DATA ####
 otu <- readRDS("./data/soils_otu_low_24.rds")
@@ -47,7 +47,7 @@ groups <- readRDS("./data/soils_env_low_24.rds") %>% pluck("species")
 ps <- readRDS("./data/example_physeq.RDS")
 
 # USE FUNCTION ####
-out <- specifiR(comm = otu,
+out <- Fidelity(comm = otu,
                 groups = groups,
                 seed = 123,
                 n.perm = 999,
@@ -67,4 +67,4 @@ out$removed_taxa
 
 ## Detailed description of methods
 
-<img src="https://github.com/gzahn/specifiR/blob/main/assets/methods_poster.png" width="200"/>
+<img src="https://github.com/gzahn/Fidelity/blob/main/assets/methods_poster.png" width="200"/>
