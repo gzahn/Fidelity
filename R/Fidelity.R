@@ -81,7 +81,7 @@ Fidelity <-
   # class(comm) == "data.frame" (or coercible to 'data.frame')f
   # try to convert comm to data.frame
   comm <- as(comm,"data.frame")
-  if(!any("data.frame" %in% class(otu))){
+  if(!any("data.frame" %in% class(comm))){
     if(class(comm) == "matrix"){
       comm <- comm %>% as.data.frame()
       warning("comm was converted from a matrix into a data.frame")
