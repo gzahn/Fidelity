@@ -1,6 +1,6 @@
 #' Quantify group specificity of entire communities for each sample
 #'
-#'Function Fidelity assigns a community level specificity index to each community in the data set.The output values range from 0-1, with values closer to one indicating a community with taxa that are more host specific. This version of the function is a convenience wrapper for phyloseq users.
+#' Function Fidelity assigns a community level specificity index to each community in the data set.The output values range from 0-1, with values closer to one indicating a community with taxa that are more host specific. This version of the function is a convenience wrapper for phyloseq users.
 #'
 #'
 #' @import tidyr
@@ -77,7 +77,8 @@ Fidelity_physeq <-
     if(all(unique(rowSums(comm)) == 1)){
       warning("Looks like you have relative abundance data. Redo this with raw count data.")
     }
-    if(max(comm) == 1){
+    # check for presence/absence data 
+    if(all(unique(c(as(comm,"matrix"))) %in% c(0,1))){
       warning("Looks like you have presence/absence data. Results are invalid! Redo this with raw count data.")
       proceed <- readline(prompt = "You seem to be using presence/absence data. Results will be invalid. Proceed anyway? Yes or No?")
       if(proceed != "Yes"){stop("Smart move. Come back with raw observation counts.")}

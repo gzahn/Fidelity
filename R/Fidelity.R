@@ -92,7 +92,8 @@ Fidelity <-
   if(all(unique(rowSums(comm)) == 1)){
     warning("Looks like you have relative abundance data. Redo this with raw count data.")
   }
-  if(max(comm) == 1){
+  # check for presence/absence data 
+  if(all(unique(c(as(comm,"matrix"))) %in% c(0,1))){
     warning("Looks like you have presence/absence data. Results are invalid! Redo this with raw count data.")
     proceed <- readline(prompt = "You seem to be using presence/absence data. Results will be invalid. Proceed anyway? Yes or No?")
     if(proceed != "Yes"){stop("Smart move. Come back with raw observation counts.")}
@@ -229,6 +230,7 @@ Fidelity <-
   iv.max_perm <- future_replicate(n.perm, {
     calc_ivmax(sample(sample_groups))
   })
+  assign(x = "iv_max_perm",iv.max_perm,envir = .GlobalEnv)
 
   # Empirical p-values
   iv.pval <- rowMeans(iv.max_perm >= iv.max_obs)
