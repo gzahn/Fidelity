@@ -67,7 +67,7 @@ out$isa_results
 out$process_summary
 out$removed_taxa
 
-# USE FUNCTION compatible with phyloseq objects####
+# USE FUNCTION COMPATIBLE WITH PHYLOSEQ OBJECTS####
 out_ps <- Fidelity_physeq(physeq,
                 groups,
                 seed = 123,
