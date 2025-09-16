@@ -4,7 +4,7 @@
 
 (Replace with better hex sticker...)
 
-The goal of SpecifiR is to provide a user-friendly tool to quantify and compare the host specificity of microbial communities. 
+The goal of Fidelity is to provide a user-friendly tool to quantify and compare the host specificity of microbial communities. 
 Our method is a three step analysis that integrates the Indicator Species Analysis (ISA) with a Community Weighted Mean (CWM) analysis. 
 First, a specificity value is assigned to each taxon through the ISA. Second, a threshold is established for removing rare taxa. 
 Third, community level indices are generated through a CWM analysis using all taxa that meet the rare taxa threshold. 
@@ -66,6 +66,24 @@ out$taxon_specificity_index
 out$isa_results
 out$process_summary
 out$removed_taxa
+
+# USE FUNCTION compatible with phyloseq objects####
+out_ps <- Fidelity_physeq(physeq,
+                groups,
+                seed = 123,
+                n.perm = 999,
+                pval.cutoff = 0.05,
+                max.ratio = 0,
+                ovp.plot = TRUE,
+                rm.rare.taxa = TRUE)
+
+# EXAMINE OUTPUT ####
+out_ps$community_specificity_index
+out_ps$taxon_specificity_index
+out_ps$isa_results
+out_ps$process_summary
+out_ps$removed_taxa
+
 
 ```
 
