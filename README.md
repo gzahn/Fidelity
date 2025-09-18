@@ -54,11 +54,12 @@ ps <- readRDS("./data/example_physeq.RDS")
 out <- Fidelity(comm = otu,
                 groups = groups,
                 seed = 123,
-                n.perm = 999,
+                n.perm = 99,
                 pval.cutoff = 0.05,
                 max.ratio = 0,
                 ovp.plot = TRUE,
-                rm.rare.taxa = TRUE)
+                rm.rare.taxa = FALSE,
+                allow.pa = FALSE)
 
 # EXAMINE OUTPUT ####
 out$community_specificity_index
@@ -66,23 +67,6 @@ out$taxon_specificity_index
 out$isa_results
 out$process_summary
 out$removed_taxa
-
-# USE FUNCTION COMPATIBLE WITH PHYLOSEQ OBJECTS####
-out_ps <- Fidelity_physeq(physeq,
-                groups,
-                seed = 123,
-                n.perm = 999,
-                pval.cutoff = 0.05,
-                max.ratio = 0,
-                ovp.plot = TRUE,
-                rm.rare.taxa = TRUE)
-
-# EXAMINE OUTPUT ####
-out_ps$community_specificity_index
-out_ps$taxon_specificity_index
-out_ps$isa_results
-out_ps$process_summary
-out_ps$removed_taxa
 
 
 ```
