@@ -69,6 +69,24 @@ out$process_summary
 out$removed_taxa
 
 
+# USE FUNCTION COMPATIBLE WITH PHYLOSEQ OBJECTS####
+out_ps <- Fidelity_physeq(physeq,
+                groups,
+                seed = 123,
+                n.perm = 999,
+                pval.cutoff = 0.05,
+                max.ratio = 0,
+                ovp.plot = TRUE,
+                rm.rare.taxa = TRUE)
+
+# EXAMINE OUTPUT ####
+out_ps$community_specificity_index
+out_ps$taxon_specificity_index
+out_ps$isa_results
+out_ps$process_summary
+out_ps$removed_taxa
+
+
 ```
 
 ## Detailed description of methods

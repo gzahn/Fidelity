@@ -271,7 +271,6 @@ Fidelity <-
     calc_ivmax(sample(sample_groups)),
     future.seed = TRUE  # moved this from item 3 but safe here too
   )
-  #assign(x = "iv_max_perm",iv.max_perm,envir = .GlobalEnv)
 
   # Empirical p-values
   iv.pval <- rowMeans(iv.max_perm >= iv.max_obs)
