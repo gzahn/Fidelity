@@ -58,7 +58,8 @@ out <- Fidelity(comm = otu,
                 pval.cutoff = 0.05,
                 max.ratio = 0,
                 ovp.plot = TRUE,
-                rm.rare.taxa = TRUE)
+                rm.rare.taxa = TRUE,
+                allow.pa = FALSE)
 
 # EXAMINE OUTPUT ####
 out$community_specificity_index
@@ -75,7 +76,8 @@ out_ps <- Fidelity_physeq(physeq,
                 pval.cutoff = 0.05,
                 max.ratio = 0,
                 ovp.plot = TRUE,
-                rm.rare.taxa = TRUE)
+                rm.rare.taxa = TRUE,
+                allow.pa = FALSE)
 
 # EXAMINE OUTPUT ####
 out_ps$community_specificity_index
