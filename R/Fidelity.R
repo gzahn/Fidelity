@@ -18,11 +18,12 @@
 #' @param max.ratio The maximum ratio of significant:insignificant P-values within a group. Taxa are grouped by the number of samples in which they occur. Groups in which no taxa have a significant p-value from the ISA will be flagged as a group of rare taxa. Only the first N occurrence groups that have this value or lower will be flagged for rare taxon removal. Default = 0. You are unlikely to want to change this value.
 #' @param ovp.plot Logical. Should a plot of occupancy vs. p-values be generated? This will visualize the max.ratio cutoff for rare taxa removal. Default = FALSE.
 #' @param rm.rare.taxa Logical. Should rare taxa be removed before the CWM? Default = TRUE. Set to FALSE if you want to perform the Community Weighted Mean analysis on all taxa.
+#' @param allow.pa Logical. Should presence/absence data be allowed? Default = FALSE. Presence/absence data are not valid for this test, but users may want to run it anyway for side effects.
 #'
 #' @return Named List. This returns a list with 5 elements:
 #' community_specificity_index = The main result showing community weighted mean for each sample, communities with greater values are more specific;
-#' taxon_specificity_index = Intermediate result (`comm_name` `iv.max` `p.value` `occurrence` `occurrence_groups` `taxon_index` `most_loyal_to`), taxa that are more host specific will have a greater taxon_index;
-#' isa_results = Intermediate results. taxon-level indicator species analysis with each given group level, and the indicator results for each taxon. The column "most_loyal_to" indicates the group for which that taxon had the highest loyalty;
+#' taxon_specificity_index = Intermediate result (`comm_name` `iv.max` `p.value` `taxon_index` `most_loyal_to`), taxa that are more host specific will have a greater taxon_index. The column "most_loyal_to" indicates the group for which that taxon had the highest loyalty;
+#' isa_results = Intermediate results. taxon-level indicator species analysis with each given group level, and the indicator results for each taxon;
 #' process_summary = Reports basic info on process, including the number of taxa removed due to rarity;
 #' removed_taxa = Character vector with names of taxa removed due to rarity.
 #'
@@ -36,15 +37,28 @@
 #' The user has the option of removing rare taxa from the CWM analysis. Rare taxa bias communities to appear more host specific. The rare taxa removal threshold is determined by first grouping taxa by the number of samples in which they occur, then removing the groups in which the taxa are so rare that no taxon has a significant result from the ISA. The default is for rare taxa to be removed.
 #'
 #' @examples
-#' # make mock community and grouping data
-#' comm_matrix <- matrix(rpois(30 * 100, lambda = 5),nrow = 30,ncol = 100)
-#' colnames(comm_matrix) <- paste0("taxon.", 1:100)
-#' comm_df <- as.data.frame(comm_matrix)
-#' groups <- factor(rep(paste0("Group", 1:3), length.out = 100))
+#' \donttest{
+#'   set.seed(1)
 #'
-#' # run Fidelity with default settings
-#' out <- Fidelity(comm = comm_df, groups = groups)
-#' out$community_specificity_index
+#'   # Use a sequential plan for examples (restore on exit)
+#'   old_plan <- future::plan(future::sequential)
+#'   on.exit(future::plan(old_plan), add = TRUE)
+#'
+#'   # Mock community and grouping data
+#'   n_samples <- 30
+#'   n_taxa <- 100
+#'   comm_matrix <- matrix(rpois(n_samples * n_taxa, lambda = 5),
+#'                         nrow = n_samples, ncol = n_taxa)
+#'   colnames(comm_matrix) <- paste0("taxon.", seq_len(n_taxa))
+#'   comm_df <- as.data.frame(comm_matrix)
+#'
+#'   # groups must match number of rows (samples)
+#'   groups <- factor(rep(paste0("Group", 1:3), length.out = nrow(comm_df)))
+#'
+#'   # Smaller n.perm to keep examples quick and stable
+#'   out <- Fidelity(comm = comm_df, groups = groups, n.perm = 199)
+#'   out$community_specificity_index
+#' }
 #'
 #' @export
 
@@ -56,17 +70,17 @@ Fidelity <-
            pval.cutoff=0.05,
            max.ratio=0,
            ovp.plot=FALSE,
-           rm.rare.taxa=TRUE){
+           rm.rare.taxa=TRUE,
+           allow.pa = FALSE){
 
   # TESTS ####
 
-  # all packages available in namespace
-  library(tidyverse)
-  library(future)
-  library(future.apply)
+
 
   # cross-platform parallelism
-  plan(multisession)
+  op <- future::plan(multisession)
+  on.exit(future::plan(op), add = TRUE)
+
   set.seed(seed)
 
   # helper operator
@@ -78,26 +92,27 @@ Fidelity <-
     groups <- as.character(groups)
     warning("Grouping variable converted to character class.")
   }
-  # class(comm) == "data.frame" (or coercible to 'data.frame')f
+  # class(comm) == "data.frame" (or coercible to 'data.frame')
   # try to convert comm to data.frame
-  comm <- as(comm,"data.frame")
-  if(!any("data.frame" %in% class(comm))){
-    if(class(comm) == "matrix"){
-      comm <- comm %>% as.data.frame()
+  if(!inherits(comm, "data.frame")) {
+    if(is.matrix(comm)) {
+      comm <- as.data.frame(comm)
       warning("comm was converted from a matrix into a data.frame")
+    } else {
+      stop("Community matrix must be a data.frame or matrix.")
     }
-    stop("Community matrix must be coercible to a data.frame object.")
   }
   # check that community data is raw counts
   if(all(unique(rowSums(comm)) == 1)){
     warning("Looks like you have relative abundance data. Redo this with raw count data.")
   }
-  # check for presence/absence data 
-  if(all(unique(c(as(comm,"matrix"))) %in% c(0,1))){
-    warning("Looks like you have presence/absence data. Results are invalid! Redo this with raw count data.")
-    proceed <- readline(prompt = "You seem to be using presence/absence data. Results will be invalid. Proceed anyway? Yes or No?")
-    if(proceed != "Yes"){stop("Smart move. Come back with raw observation counts.")}
-    if(proceed == "Yes"){message("Results will be invalid, but you probably have your reasons...")}
+  # check for presence/absence data
+  if (all(unique(c(as.matrix(comm))) %in% c(0, 1))) {
+    if (!allow_pa) {
+      stop("Input looks like presence or absence data. Set allow_pa = TRUE to override, but results will be invalid.")
+    } else {
+      warning("Proceeding with presence or absence data. Results will be invalid.")
+    }
   }
   # check if data appear to be rarefied
   if(length(unique(rowSums(comm))) == 1){
@@ -148,7 +163,13 @@ Fidelity <-
 
   df_rel_abund <- group_sums %>%
     rowwise() %>%
-    mutate(across(where(is.numeric), ~ .x / sum(c_across(where(is.numeric))))) %>%
+    mutate(across(
+      where(is.numeric),
+      ~ {
+        s <- sum(c_across(where(is.numeric)))
+        if (s == 0) 0 else .x / s
+      }
+    )) %>%
     ungroup()
 
   ## Step 2. calculate fidelity ####
@@ -210,35 +231,55 @@ Fidelity <-
 
   # Function to compute iv.max from group labels
   calc_ivmax <- function(shuffled_groups) {
+    # Sum abundances by group: rows = taxa, cols = groups
     group_sums <- sapply(group_levels, function(g) {
       colSums(comm_matrix[shuffled_groups == g, , drop = FALSE])
     })
-    group_sums_rel <- sweep(group_sums, 2, colSums(group_sums), "/")
+    # Ensure matrix
+    group_sums <- as.matrix(group_sums)
 
+    # SPECIFICITY: proportion of each taxon's total that sits in each group (row-wise norm)
+    row_totals <- rowSums(group_sums)
+    # Avoid divide-by-zero: taxa absent everywhere under this shuffle
+    row_totals[row_totals == 0] <- NA
+    group_sums_rel <- sweep(group_sums, 1, row_totals, "/")  # rows (taxa) sum to 1 across groups
+
+    # FIDELITY: fraction of samples in group where taxon is present
     group_fidels <- sapply(group_levels, function(g) {
       colSums(comm_pa[shuffled_groups == g, , drop = FALSE]) / sum(shuffled_groups == g)
     })
+    group_fidels <- as.matrix(group_fidels)
 
-    indval <- t(group_sums_rel * group_fidels) * 100
-    apply(indval, 2, max)
+    # Indicator value
+    # elementwise multiply, then 100. Keep orientation consistent: rows = taxa, cols = groups
+    indval <- group_sums_rel * group_fidels
+    indval[is.na(indval)] <- 0
+    indval <- indval * 100
+
+    # iv.max per taxon (max across groups)
+    apply(indval, 1, max)
   }
 
   # Observed iv.max
   iv.max_obs <- calc_ivmax(sample_groups)
 
-  # Permuted iv.max values
-  iv.max_perm <- future_replicate(n.perm, {
-    calc_ivmax(sample(sample_groups))
-  })
-  assign(x = "iv_max_perm",iv.max_perm,envir = .GlobalEnv)
 
+  # Permuted iv.max values
+  RNGkind("L'Ecuyer-CMRG")
+  iv.max_perm <- future_replicate(
+    n.perm,
+    calc_ivmax(sample(sample_groups)),
+    future.seed = TRUE  # moved this from item 3 but safe here too
+  )
+
+  assign(x = "iv_max_perm",iv.max_perm,envir = .GlobalEnv)
   # Empirical p-values
   iv.pval <- rowMeans(iv.max_perm >= iv.max_obs)
 
   # Output result
   indicator_results <- tibble(
     comm_name = colnames(comm_matrix),
-    iv.max = iv.max,
+    iv.max = iv.max_obs,
     p.value = iv.pval
   )
 
@@ -254,20 +295,19 @@ Fidelity <-
 
   # REMOVE RARE TAXA ####
 
-  occurrence_groups <- factor(indicator_results[["occurrence"]])
-  indicator_results[["occurrence_groups"]] <- occurrence_groups
+  # We already have indicator_results$occurrence (integer counts)
+  # Build the ratio table BY OCCURRENCE, not factor positions
+  ratio_df <- indicator_results %>%
+    mutate(significant = p.value <= pval.cutoff) %>%
+    group_by(occurrence) %>%
+    summarize(
+      ratio   = sum(significant) / sum(!significant),
+      n_sig   = sum(significant),
+      n_insig = sum(!significant),
+      .groups = "drop"
+    )
 
-  # make ratio dataframe that connects Nsites groups to ratio of sig/non-sig pvalues
-  ratio_df <-
-    indicator_results %>%
-    mutate(significant = p.value <= 0.05) %>%
-    group_by(occurrence_groups) %>%
-    summarize(ratio = sum(significant) / sum(!significant),
-              n_sig = sum(significant),
-              n_insig = sum(!significant))
-
-  # deal with Inf values
-  # these are occurrence groups that have ONLY significant taxa
+  # Deal with Inf (all significant), treat as 1 (the maximum possible ratio)
   ratio_df$ratio[is.infinite(ratio_df$ratio)] <- 1
 
   # find which taxa to remove (first N taxa at or below max.ratio)
@@ -284,46 +324,42 @@ Fidelity <-
     warning("No rare taxa detected for removal prior to CWM analysis.")
   }
 
+  # Determine the cutoff: largest occurrence whose ratio <= max.ratio
+  drop_occs <- ratio_df$occurrence[ratio_df$ratio <= max.ratio]
+  occurrence_cutoff <- if (length(to_remove)) max(to_remove) else 0
+
   # OPTIONAL OCCUPANCY VS P.VALUE PLOT ####
-  if(ovp.plot & to_remove[1] == 1){
+  if (ovp.plot && occurrence_cutoff > 0) {
     p <-
       indicator_results %>%
-      ggplot(aes(x=occurrence,y=p.value,color=iv.max)) +
-      geom_point(size=2,alpha=ifelse(nrow(indicator_results) > 1000, .75,1)) +
-      labs(x="Number of site occurrences",y="P value",color="Indicator\nvalue") +
-      geom_hline(yintercept = pval.cutoff,linetype=2) +
-      geom_vline(xintercept = max(to_remove),linetype=2) +
-      scale_color_viridis_c(end=.9) +
-      theme_bw() +
-      theme(axis.title = element_text(face='bold',size=14),
-            axis.text = element_text(face='bold',size=10),
-            legend.title = element_text(face='bold',size=14),
-            legend.text = element_text(face='bold'))
+      ggplot(aes(x = occurrence, y = p.value, color = iv.max)) +
+      geom_point(size = 2, alpha = ifelse(nrow(indicator_results) > 1000, .75, 1)) +
+      labs(x = "Number of site occurrences", y = "P value", color = "Indicator\nvalue") +
+      geom_hline(yintercept = pval.cutoff, linetype = 2) +
+      geom_vline(xintercept = occurrence_cutoff, linetype = 2) +
+      scale_color_viridis_c(end = .9) +
+      theme_bw()
     print(p)
   }
 
-  if(rm.rare.taxa){
-    # subset indicator results
-    isa_subset <-
-      indicator_results %>%
-      dplyr::filter(occurrence %ni% to_remove)
+  if (rm.rare.taxa && occurrence_cutoff > 0) {
+    # subset indicator results by actual occurrence counts
+    isa_subset <- indicator_results %>% filter(occurrence > occurrence_cutoff)
 
-    # subset comm table to match
-    comm_subset <-
-      comm[,colnames(comm) %in% isa_subset$comm_name]
+    # subset comm to match (preserve shape)
+    comm_subset <- comm[, colnames(comm) %in% isa_subset$comm_name, drop = FALSE]
 
-    # find taxa that were removed due to rarity
-    starting_taxa <- names(comm)[names(comm) != "group"]
-    removed_taxa <- starting_taxa[starting_taxa %ni% names(comm_subset)]
-    if(!to_remove[1] > 1){
-      cat(paste0("Removed taxa present in ",max(to_remove)," sites or fewer."))
-    }
+    # find removed taxa (exclude the injected 'group' column if present)
+    starting_taxa <- setdiff(colnames(comm), "group")
+    removed_taxa  <- setdiff(starting_taxa, colnames(comm_subset))
+
+    message(paste0("Removed taxa present in ", occurrence_cutoff, " sites or fewer."))
   } else {
     isa_subset <- indicator_results
     comm_subset <- comm
     comm$group <- NULL
     comm_subset$group <- NULL
-    removed_taxa <- NA
+    removed_taxa <- character(0)
   }
 
   # calculate taxon index (so bigger indicates more indicative)
@@ -342,33 +378,51 @@ Fidelity <-
   # clean up data frame a bit
   indicator_results$occurrence <- NULL
 
-  # create process summary
+  comm_subset_num <- comm_subset
+  if ("group" %in% colnames(comm_subset_num)) {
+    comm_subset_num <- comm_subset_num[, setdiff(colnames(comm_subset_num), "group"), drop = FALSE]
+  }
 
+  # create process summary
   process_summary <-
-  data.frame(n_samples_start=nrow(comm),
-             n_samples_end=nrow(comm_subset),
-             n_taxa_start=ncol(comm),
-             n_taxa_end=ncol(comm_subset),
-             n_raretaxa_removed=(ncol(comm) - ncol(comm_subset))-1,
-             occurence_cutoff=max(to_remove),
-             pval_cutoff=pval.cutoff,
-             n_perm=n.perm)
+    data.frame(
+      n_samples_start    = nrow(comm_matrix),
+      n_samples_end      = nrow(comm_subset),
+      n_taxa_start       = ncol(comm_matrix),
+      n_taxa_end         = ncol(comm_subset_num),
+      n_raretaxa_removed = ncol(comm_matrix) - ncol(comm_subset_num),
+      occurrence_cutoff  = occurrence_cutoff,
+      pval_cutoff        = pval.cutoff,
+      n_perm             = n.perm
+    )
 
   # clean up indicator results to show group of highest "loyalty" per taxon
-  df <- indicator_values
-  search <- df %>% select(-iv.max,-taxon)          # all columns to search
-  M <- abs(as.matrix(search) - df$iv.max) < 1e-9   # near-equality per row
-  idx <- max.col(M, ties.method = "first")  # first TRUE per row
-  idx[rowSums(M) == 0] <- NA_integer_       # no match in that row
-  df$most_loyal_to <- names(search)[idx]
+  indicator_df <- as_tibble(as.data.frame(indicator_values), .name_repair = "minimal")
+  # do NOT overwrite 'taxon' here; it already exists in indicator_values
 
-  # add to taxon_specificity_index
-  indicator_results$most_loyal_to <- df$most_loyal_to
+  # Put groups in a known order (same as group_levels), then add iv.max from obs
+  indicator_df <- indicator_df %>%
+    relocate(all_of(group_levels), .before = everything()) %>%
+    mutate(iv.max = iv.max_obs) %>%
+    relocate(taxon, .before = everything())
 
-    # create output object (list)
+  # Select strictly numeric group columns for the search matrix
+  search <- indicator_df %>% select(all_of(group_levels))  # numeric only
+
+  # Compute most-loyal group using the trusted maxima
+  M <- abs(as.matrix(search) - iv.max_obs) < 1e-9
+  idx <- max.col(M, ties.method = "first")     # tie-breaker = first group
+  idx[rowSums(M) == 0] <- NA_integer_          # no exact match (should be rare)
+  indicator_df$most_loyal_to <- colnames(search)[idx]
+
+  # Push this back into results
+  indicator_results$most_loyal_to <- indicator_df$most_loyal_to
+
+
+  # create output object (list)
   out <- list(community_specificity_index = output,
               taxon_specificity_index = indicator_results,
-              isa_results = indicator_values,
+              isa_results = indicator_df,
               process_summary = process_summary,
               removed_taxa = removed_taxa)
 
