@@ -2,7 +2,7 @@
 
 <img src="https://github.com/gzahn/Fidelity/blob/main/assets/sticker.png" alt="hex_sticker" width="200"/>
 
-(Replace with better hex sticker...)
+(Replace with better hex sticker... )
 
 The goal of Fidelity is to provide a user-friendly tool to quantify and compare the host specificity of microbial communities. 
 Our method is a three step analysis that integrates the Indicator Species Analysis (ISA) with a Community Weighted Mean (CWM) analysis. 
