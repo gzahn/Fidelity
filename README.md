@@ -28,9 +28,12 @@ Depends on:
 
 ## Citation
 
-[![DOI](https://zenodo.org/badge/1016289767.svg)](https://doi.org/10.5281/zenodo.16095120)
 
-Zahn, G., & Neat, A. (2025). gzahn/Fidelity: Beta release (Version 0.0.0) [Computer software]. Zenodo. https://doi.org/10.5281/ZENODO.16095121
+
+[![DOI](https://zenodo.org/badge/1044557046.svg)](https://doi.org/10.5281/zenodo.17351657)
+
+
+Geoffrey Zahn, & Abigail Sievers Neat. (2025). gzahn/Fidelity: Initial release (Version v1.0) [Computer software]. Zenodo. https://doi.org/10.5281/ZENODO.17351658
 
 
 
