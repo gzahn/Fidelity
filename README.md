@@ -70,7 +70,7 @@ out$process_summary
 out$removed_taxa
 
 # USE FUNCTION COMPATIBLE WITH PHYLOSEQ OBJECTS####
-out_ps <- Fidelity_physeq(physeq,
+out_ps <- Fidelity_physeq(ps,
                 groups,
                 seed = 123,
                 n.perm = 999,
