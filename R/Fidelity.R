@@ -114,12 +114,6 @@ Fidelity <-
       warning("Proceeding with presence or absence data. Results will be invalid.")
     }
   }
-  # check if data appear to be rarefied
-  if(length(unique(rowSums(comm))) == 1){
-    warning("Are your data rarefied to a uniform sampling effort? This is not advisable. It is better to incorporate sampling effort (e.g., sequencing depth) as a model term, and not to throw away your data!")
-    warning("True rarefaction would require you to conduct the rarefaction step and all subsequent analyses repeatedly.")
-    message("If you want to rarefy, you will need to repeat this (and any other) analysis once for each rarefaction iteration. Consider using your actual raw data instead.")
-  }
 
   # length(groups) == nrow(comm)
   if(length(groups) != nrow(comm)){
@@ -158,6 +152,7 @@ Fidelity <-
     comm_subset <- comm %>% dplyr::filter(group %in% i)
     comm_subset$group <- NULL
     comm_sums <- colSums(comm_subset)
+    comm_sums <- comm_sums/nrow(comm_subset)
     group_sums[[i]] <- comm_sums
   }
 
@@ -233,7 +228,7 @@ Fidelity <-
   calc_ivmax <- function(shuffled_groups) {
     # Sum abundances by group: rows = taxa, cols = groups
     group_sums <- sapply(group_levels, function(g) {
-      colSums(comm_matrix[shuffled_groups == g, , drop = FALSE])
+      colSums(comm_matrix[shuffled_groups == g, , drop = FALSE]) / sum(shuffled_groups == g)
     })
     # Ensure matrix
     group_sums <- as.matrix(group_sums)
@@ -272,7 +267,6 @@ Fidelity <-
     future.seed = TRUE  # moved this from item 3 but safe here too
   )
 
-  assign(x = "iv_max_perm",iv.max_perm,envir = .GlobalEnv)
   # Empirical p-values
   iv.pval <- rowMeans(iv.max_perm >= iv.max_obs)
 
