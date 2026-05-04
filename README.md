@@ -39,7 +39,7 @@ Geoffrey Zahn, & Abigail Sievers Neat. (2025). gzahn/Fidelity: Initial release (
 
 ## Example usage
 
-For a thorough walkthrough, see the [Tutorial](https://rpubs.com/neata/1337966)
+For a thorough walkthrough, see the [Tutorial](https://rpubs.com/neata/1429275)
 
 
 ```
