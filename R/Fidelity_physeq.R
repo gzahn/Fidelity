@@ -21,8 +21,8 @@
 #' @param allow.pa Logical. Should presence/absence data be allowed? Default = FALSE. Presence/absence data are not valid for this test, but users may want to run it anyway for side effects.
 #'
 #' @return Named List. This returns a list with 5 elements:
-#' community_specificity_index = The main result showing community weighted mean for each sample, communities with greater values are more specific;
-#' taxon_specificity_index = Intermediate result (`comm_name` `iv.max` `p.value` `occurrence` `occurrence_groups` `taxon_index` `most_loyal_to`), taxa that are more host specific will have a greater taxon_index;
+#' community_index = The main result showing community weighted mean for each sample, communities with greater values are more specific;
+#' taxon_index = Intermediate result (`comm_name` `iv.max` `p.value` `occurrence` `occurrence_groups` `taxon_index` `most_loyal_to`), taxa that are more host specific will have a greater taxon_index;
 #' isa_results = Intermediate results. taxon-level indicator species analysis with each given group level, and the indicator results for each taxon;
 #' process_summary = Reports basic info on process, including the number of taxa removed due to rarity;
 #' removed_taxa = Character vector with names of taxa removed due to rarity.

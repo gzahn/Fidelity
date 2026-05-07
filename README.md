@@ -39,7 +39,7 @@ Geoffrey Zahn, & Abigail Sievers Neat. (2025). gzahn/Fidelity: Initial release (
 
 ## Example usage
 
-For a thorough walkthrough, see the [Tutorial](https://rpubs.com/neata/1337966)
+For a thorough walkthrough, see the [tutorial](https://rpubs.com/neata/1337966)
 
 
 ```
@@ -63,8 +63,8 @@ out <- Fidelity(comm = otu,
                 allow.pa = FALSE)
 
 # EXAMINE OUTPUT ####
-out$community_specificity_index
-out$taxon_specificity_index
+out$community_index
+out$taxon_index
 out$isa_results
 out$process_summary
 out$removed_taxa
@@ -81,8 +81,8 @@ out_ps <- Fidelity_physeq(ps,
                 allow.pa = FALSE)
 
 # EXAMINE OUTPUT ####
-out_ps$community_specificity_index
-out_ps$taxon_specificity_index
+out_ps$community_index
+out_ps$taxon_index
 out_ps$isa_results
 out_ps$process_summary
 out_ps$removed_taxa
