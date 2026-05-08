@@ -12,10 +12,11 @@ The resulting indices can be used to compare the specificity of microbial commun
 ## Installation:
 
 ```
-if (!requireNamespace("devtools", quietly = TRUE))
-    install.packages("devtools")
-    
-devtools::install_github("gzahn/Fidelity")
+if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+}
+
+remotes::install_github("gzahn/Fidelity", upgrade = "never", dependencies = TRUE)
 ```
 
 ## Requirements
