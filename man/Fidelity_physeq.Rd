@@ -37,8 +37,8 @@ Fidelity_physeq(
 }
 \value{
 Named List. This returns a list with 5 elements:
-community_specificity_index = The main result showing community weighted mean for each sample, communities with greater values are more specific;
-taxon_specificity_index = Intermediate result (`comm_name` `iv.max` `p.value` `occurrence` `occurrence_groups` `taxon_index` `most_loyal_to`), taxa that are more host specific will have a greater taxon_index;
+community_index = The main result showing community weighted mean for each sample, communities with greater values are more specific;
+taxon_index = Intermediate result (`comm_name` `iv.max` `p.value` `occurrence` `occurrence_groups` `taxon_index` `most_loyal_to`), taxa that are more host specific will have a greater taxon_index;
 isa_results = Intermediate results. taxon-level indicator species analysis with each given group level, and the indicator results for each taxon;
 process_summary = Reports basic info on process, including the number of taxa removed due to rarity;
 removed_taxa = Character vector with names of taxa removed due to rarity.
@@ -56,7 +56,8 @@ Community level specificity indices are then generated through CWM analysis usin
 The user has the option of removing rare taxa from the CWM analysis. Rare taxa bias communities to appear more host specific. The rare taxa removal threshold is determined by first grouping taxa by the number of samples in which they occur, then removing the groups in which the taxa are so rare that no taxon has a significant result from the ISA. The default is for rare taxa to be removed.
 }
 \examples{
+\dontrun{
 out <- Fidelity_physeq(physeq = ps,groups = "depth",n.perm = 99)
-out$community_specificity_index
-
+out$community_index
+}
 }

@@ -108,8 +108,8 @@ Fidelity <-
   }
   # check for presence/absence data
   if (all(unique(c(as.matrix(comm))) %in% c(0, 1))) {
-    if (!allow_pa) {
-      stop("Input looks like presence or absence data. Set allow_pa = TRUE to override, but results will be invalid.")
+    if (!allow.pa) {
+      stop("Input looks like presence or absence data. Set allow.pa = TRUE to override, but results will be invalid.")
     } else {
       warning("Proceeding with presence or absence data. Results will be invalid.")
     }

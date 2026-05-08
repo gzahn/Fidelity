@@ -47,9 +47,9 @@ For a thorough walkthrough, see the [tutorial](https://rpubs.com/neata/1337966)
 library(Fidelity)
 
 # LOAD DATA ####
-otu <- readRDS("./data/soils_otu_low_24.rds")
-groups <- readRDS("./data/soils_env_low_24.rds") %>% pluck("species")
-ps <- readRDS("./data/example_physeq.RDS")
+otu <- readRDS(system.file("extdata", "soils_otu_low_24.rds", package = "Fidelity"))
+groups <- readRDS(system.file("extdata", "soils_env_low_24.rds", package = "Fidelity"))[["species"]]
+ps <- readRDS(system.file("extdata", "example_physeq.RDS", package = "Fidelity"))
 
 # USE FUNCTION ####
 out <- Fidelity(comm = otu,
