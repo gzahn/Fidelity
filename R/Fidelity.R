@@ -348,6 +348,7 @@ Fidelity <-
     removed_taxa  <- setdiff(starting_taxa, colnames(comm_subset))
 
     message(paste0("Removed taxa present in ", occurrence_cutoff, " samples or fewer."))
+    message(paste0(sum(indicator_results$p.value <= 0.05), " taxa are considered highly host specific for ", length(group_levels), " groups."))
   } else {
     isa_subset <- indicator_results
     comm_subset <- comm
